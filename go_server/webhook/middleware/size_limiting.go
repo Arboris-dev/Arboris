@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"Arboris/go_server/httpwriters"
 	"io"
 	"log/slog"
 	"net/http"
@@ -15,7 +14,7 @@ func MaxBodySize(maxSize int64) func(http.Handler) http.Handler {
 				err := Body.Close()
 				if err != nil {
 					slog.Error("Github payload exceeds max size", "ERROR", err)
-					httpwriters.RespondWithErr(w, "File exceeds max size", 413)
+					http.Error(w, "File exceeds max size", 413)
 				}
 			}(r.Body)
 			next.ServeHTTP(w, r)
