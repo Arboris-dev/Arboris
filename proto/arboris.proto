@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package arboris.v1;
+
+option go_package = "github.com/Arboris-dev/Arboris/generated/go;arboris";
+
+enum Language {
+  LANGUAGE_UNSPECIFIED = 0;
+  PYTHON = 1;
+  JAVA = 2;
+  GO = 3;
+  JAVASCRIPT = 4;
+  TYPESCRIPT = 5;
+}
+
+enum Severity {
+  SEVERITY_UNSPECIFIED = 0;
+  STYLE = 1;
+  PERFORMANCE = 2;
+  BUG = 3;
+  SECURITY = 4;
+}
+
+enum NodeType {
+  NODE_TYPE_UNSPECIFIED = 0;
+  FUNCTION = 1;
+  METHOD = 2;
+  CLASS = 3;
+}
+
+enum ChangeType {
+  CHANGE_TYPE_UNSPECIFIED = 0;
+  ADDED = 1;
+  MODIFIED = 2;
+  DELETED = 3;
+}
+
+message ASTContext {
+  string file_path       = 1;
+  Language language      = 2;
+  NodeType node_type     = 3;
+  string node_name       = 4;
+  string parent_node_name = 5;
+  ChangeType change_type = 6;
+  int32 start_line       = 7;
+  int32 end_line         = 8;
+  string context_before  = 9;
+  string context_after   = 10;
+}
+
+message GraphContext {
+  string project_id                        = 1;
+  string developer_login                   = 2;
+  repeated ReviewComment recent_file_comments   = 3;
+  repeated ReviewComment recent_author_comments = 4;
+  repeated PatternMatch active_patterns         = 5;
+}
+
+message ReviewComment {
+  string file_path   = 1;
+  int32 line_number  = 2;
+  Severity severity  = 3;
+  string category    = 4;
+  string message     = 5;
+  string reason      = 6;
+  float confidence   = 7;
+  string pattern_id  = 8;
+}
+
+message PatternMatch {
+  string pattern_id           = 1;
+  string category             = 2;
+  float similarity_score      = 3;
+  int32 recurrence_count      = 4;
+  repeated string example_pr_refs = 5;
+}
+
+message EmbeddingVector {
+  repeated float values = 1;
+  string model_name     = 2;
+}
+
+message ReviewPullRequestRequest {
+  int64 installation_id           = 1;
+  string repo_full_name           = 2;
+  int32 pr_number                 = 3;
+  string head_sha                 = 4;
+  repeated ASTContext modified_files = 5;
+  GraphContext graph_context      = 6;
+}
+
+message ClassifyDiffRequest {
+  repeated ASTContext ast_contexts = 1;
+}
+
+message ClassifyDiffResponse {
+  Severity severity  = 1;
+  float confidence   = 2;
+}
+
+message DetectPatternsRequest {
+  string developer_login              = 1;
+  repeated ReviewComment recent_comments = 2;
+}
+
+message DetectPatternsResponse {
+  repeated PatternMatch patterns = 1;
+}
+
+message GenerateEmbeddingRequest {
+  string text       = 1;
+  string model_name = 2;
+}
+
+message GenerateEmbeddingResponse {
+  EmbeddingVector embedding = 1;
+}
+
+service ReviewService {
+  rpc ReviewPullRequest(ReviewPullRequestRequest) returns (stream ReviewComment);
+  rpc ClassifyDiff(ClassifyDiffRequest)           returns (ClassifyDiffResponse);
+  rpc DetectPatterns(DetectPatternsRequest)       returns (DetectPatternsResponse);
+  rpc GenerateEmbedding(GenerateEmbeddingRequest) returns (GenerateEmbeddingResponse);
+}
