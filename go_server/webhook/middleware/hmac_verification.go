@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"io"
 	"net/http"
 )
@@ -13,6 +14,12 @@ func VerifyHMAC(secret string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			body, err := io.ReadAll(r.Body)
+
+			var maxErr *http.MaxBytesError
+			if errors.As(err, &maxErr) {
+				http.Error(w, "The payload exceeds size limit", http.StatusRequestEntityTooLarge)
+				return
+			}
 
 			if err != nil {
 				http.Error(w, "Unable to read the webhook data", http.StatusInternalServerError)

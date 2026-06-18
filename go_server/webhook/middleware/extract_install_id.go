@@ -15,7 +15,11 @@ const installationIDKey contextKey = "installationID"
 
 func ExtractInstallID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, _ := io.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Unable to read the payload", http.StatusInternalServerError)
+		}
+
 		r.Body = io.NopCloser(bytes.NewReader(body))
 
 		var payload struct {

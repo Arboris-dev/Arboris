@@ -17,6 +17,6 @@ vendor/
 venv/
 env/
 ENV/
-.env/
+.env
 
 webhook_start.sh

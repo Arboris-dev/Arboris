@@ -9,12 +9,16 @@ import (
 
 type Config struct {
 	GoServer struct {
-		host string
-		port string
+		Host string
+		Port string
 	}
 	PyServer struct {
-		host string
-		port string
+		Host string
+		Port string
+	}
+	WebHook struct {
+		PayloadMaxSize int
+		Burst          int
 	}
 }
 
@@ -27,11 +31,12 @@ func GetConfig() Config {
 
 	var config Config
 
-	config.GoServer.host = os.Getenv("GO_SERVER_HOST")
-	config.GoServer.port = os.Getenv("GO_SERVER_PORT")
+	config.GoServer.Host = os.Getenv("GO_SERVER_HOST")
+	config.GoServer.Port = os.Getenv("GO_SERVER_PORT")
 
-	config.PyServer.host = os.Getenv("PYTHON_SERVER_HOST")
-	config.PyServer.port = os.Getenv("PYTHON_SERVER_PORT")
+	config.PyServer.Host = os.Getenv("PYTHON_SERVER_HOST")
+	config.PyServer.Port = os.Getenv("PYTHON_SERVER_PORT")
 
+	config.WebHook.Burst = os.Getenv("")
 	return config
 }

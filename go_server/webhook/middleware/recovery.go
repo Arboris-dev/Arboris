@@ -11,7 +11,8 @@ func Recovery(next http.Handler) http.Handler {
 			err := recover()
 			if err != nil {
 				slog.Error("Panic Recovered", "ERROR", err)
-				http.Error(w, "Unable to receive data from github", 500)
+				http.Error(w, "Unable to receive data from github", http.StatusInternalServerError)
+				return
 			}
 		}()
 		next.ServeHTTP(w, r)
