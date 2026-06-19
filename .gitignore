@@ -20,3 +20,4 @@ ENV/
 .env
 
 webhook_start.sh
+schema_notes.txt
