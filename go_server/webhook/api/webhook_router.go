@@ -23,7 +23,7 @@ func NewHookRouter(envVar config.Config, redisClient *redis.Client) (*chi.Mux, e
 	hookRouter.Use(middleware.RateLimiter(&sync.Map{}, rateLimit, envVar.WebHook.Burst))
 	hookRouter.Use(middleware.Logger)
 
-	hookRouter.Post("/webhooks/github/", WebhookHandler)
+	hookRouter.Post("/webhook/github", WebhookHandler)
 
 	return hookRouter, nil
 }

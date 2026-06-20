@@ -3,8 +3,12 @@ package main
 import (
 	"Arboris/go_server/client/reviewer"
 	"Arboris/go_server/config"
+	"Arboris/go_server/webhook/api"
 	"log"
 	"log/slog"
+	"net/http"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -31,4 +35,25 @@ func main() {
 	host := envVar.GoServer.Host
 	address := host + ":" + port
 	log.Println("Host:Port ", address)
+
+	client := redis.Client{}
+	webhookRouter, hookRouterErr := api.NewHookRouter(*envVar, &client)
+
+	if hookRouterErr != nil {
+		slog.Error("Unable to generate webhook router", "ERROR", hookRouterErr)
+	}
+
+	server := &http.Server{
+		Handler: webhookRouter,
+		Addr:    address,
+	}
+
+	err := server.ListenAndServe()
+
+	if err != nil {
+		slog.Error("Server Start error", "ERROR", err)
+	}
+
+	slog.Info("Server started", "PORT", server.Addr)
+
 }
