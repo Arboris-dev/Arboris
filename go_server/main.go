@@ -3,7 +3,6 @@ package main
 import (
 	"Arboris/go_server/client/reviewer"
 	"Arboris/go_server/config"
-	"fmt"
 	"log"
 	"log/slog"
 )
@@ -18,7 +17,7 @@ func main() {
 		slog.Info("Loaded env....")
 	}
 
-	pythonClient, conn, reviewServerErr := reviewer.ConnectToPython(envVar)
+	_, conn, reviewServerErr := reviewer.ConnectToPython(envVar)
 
 	if reviewServerErr != nil {
 		slog.Error("Unable to connect to python client", "ERROR", reviewServerErr)
@@ -32,11 +31,4 @@ func main() {
 	host := envVar.GoServer.Host
 	address := host + ":" + port
 	log.Println("Host:Port ", address)
-
-	res, err := reviewer.GenerateEmbeddings(pythonClient, "", "")
-
-	if err != nil {
-		slog.Error("Unable to reach Generate Embeddings")
-	}
-	fmt.Printf("Response : %v", res)
 }
