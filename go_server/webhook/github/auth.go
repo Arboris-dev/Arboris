@@ -21,9 +21,9 @@ type AuthUser struct {
 }
 
 type InstallationTokenResponse struct {
-	Token       string
-	ExpiresAt   string
-	Permissions []string
+	Token       string   `json:"token"`
+	ExpiresAt   string   `json:"expires_at"`
+	Permissions []string `json:"permissions"`
 }
 
 func (authDetails *AuthUser) GetInstallationToken(ctx context.Context, installId string) (string, error) {
